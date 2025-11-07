@@ -1,0 +1,132 @@
+/* ===== Reset general ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ===== Cuerpo ===== */
+body {
+  background-color: #000;
+  color: #ffcc00;
+  line-height: 1.6;
+  transition: opacity 0.5s ease;
+  padding-top: 100px; /* espacio para navbar fija */
+}
+
+/* ===== NAVBAR ===== */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background-color: #000;
+  border-bottom: 3px solid #ffcc00;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 25px;
+  z-index: 1000;
+}
+
+.navbar-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Logo */
+.logo {
+  height: 60px; /* tamaño controlado */
+  width: auto;
+  display: block;
+}
+
+/* Título al lado del logo */
+.titulo {
+  color: #ffcc00;
+  font-size: 1.5rem;
+  letter-spacing: 1px;
+}
+
+/* ===== Contenido ===== */
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h2 {
+  border-bottom: 3px solid #ffcc00;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+  color: #ffcc00;
+}
+
+p, a {
+  color: #ffcc00;
+}
+
+/* ===== Videos ===== */
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.video-item iframe {
+  width: 100%;
+  height: 200px;
+  border: 2px solid #ffcc00;
+  border-radius: 8px;
+}
+
+.video-item p {
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* ===== Documentos ===== */
+.doc-list {
+  list-style: none;
+}
+
+.doc-list li {
+  margin: 10px 0;
+}
+
+.doc-list a:hover {
+  text-decoration: underline;
+}
+
+/* ===== Footer ===== */
+footer {
+  text-align: center;
+  background-color: #111;
+  padding: 30px 20px;
+  font-size: 14px;
+  color: #ffcc00;
+  margin-top: 40px;
+}
+
+/* ===== Responsivo ===== */
+@media (max-width: 768px) {
+  .navbar {
+    height: 80px;
+    justify-content: center;
+  }
+
+  .logo {
+    height: 45px;
+  }
+
+  .titulo {
+    font-size: 1.2rem;
+  }
+
+  main {
+    padding: 15px;
+  }
+}
