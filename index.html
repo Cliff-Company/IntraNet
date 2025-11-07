@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login IntraNET Cliff</title>
   <style>
+    /* Tus estilos actuales están bien */
     body {
       font-family: Arial, sans-serif;
       background: linear-gradient(to right, #243B55, #141E30);
@@ -60,87 +61,66 @@
   </div>
 
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbywmYAqjSaVC64N_kCzZBZbxRiS3O0ecluVgcPvfpLmfNwLxJlRJ6SoTK2RModeDX1p/exec";
-    const proxy = "https://api.allorigins.win/raw?url=";
+    // 🔧 REEMPLAZA ESTA URL con tu NUEVA URL de Web App
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyQJsGdEwhUKNp-WLK7R9P-Zgw2kZgY8sDnUFvJWAxfzRg2yX5P34Vjq6j3l29p3EuJ2g/exec";
 
     async function login() {
-  const user = document.getElementById("user").value.trim();
-  const pass = document.getElementById("pass").value.trim();
-  const mensaje = document.getElementById("mensaje");
+      const user = document.getElementById("user").value.trim();
+      const pass = document.getElementById("pass").value.trim();
+      const mensaje = document.getElementById("mensaje");
 
-  mensaje.textContent = "Verificando...";
-  mensaje.style.color = "yellow";
+      mensaje.textContent = "Verificando...";
+      mensaje.style.color = "yellow";
 
-  if (!user || !pass) {
-    mensaje.textContent = "Completa los campos.";
-    mensaje.style.color = "orange";
-    return;
-  }
-
-  try {
-    // Usar fetch directamente sin proxy si es posible
-    const response = await fetch(scriptURL, {
-      method: "POST",
-      headers: { 
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-      },
-      body: JSON.stringify({ user, pass })
-    });
-
-    const result = await response.json();
-    console.log("Respuesta del servidor:", result);
-
-    if (result.success) {
-      mensaje.textContent = "✅ " + result.message;
-      mensaje.style.color = "lightgreen";
-      
-      // 🔧 Agregar verificación adicional
-      setTimeout(() => {
-        console.log("Redirigiendo a intranet.html...");
-        // Verificar si el archivo existe
-        window.location.href = "intranet.html";
-      }, 1500);
-      
-    } else {
-      mensaje.textContent = "❌ " + result.message;
-      mensaje.style.color = "red";
-    }
-
-  } catch (error) {
-    console.error("Error completo:", error);
-    // 🔧 Intentar con el proxy como fallback
-    try {
-      const proxyResponse = await fetch(proxy + encodeURIComponent(scriptURL), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user, pass })
-      });
-      
-      const proxyResult = await proxyResponse.json();
-      console.log("Respuesta via proxy:", proxyResult);
-      
-      if (proxyResult.success) {
-        mensaje.textContent = "✅ " + proxyResult.message;
-        mensaje.style.color = "lightgreen";
-        setTimeout(() => {
-          window.location.href = "intranet.html";
-        }, 1500);
-      } else {
-        mensaje.textContent = "❌ " + proxyResult.message;
-        mensaje.style.color = "red";
+      if (!user || !pass) {
+        mensaje.textContent = "Completa los campos.";
+        mensaje.style.color = "orange";
+        return;
       }
-      
-    } catch (proxyError) {
-      console.error("Error con proxy:", proxyError);
-      mensaje.textContent = "Error al conectar con el servidor.";
-      mensaje.style.color = "red";
+
+      try {
+        console.log("Enviando solicitud a:", scriptURL);
+        
+        const response = await fetch(scriptURL, {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ user, pass })
+        });
+
+        const result = await response.json();
+        console.log("Respuesta recibida:", result);
+
+        if (result.success) {
+          mensaje.textContent = "✅ " + result.message;
+          mensaje.style.color = "lightgreen";
+          
+          setTimeout(() => {
+            window.location.href = "intranet.html";
+          }, 1500);
+        } else {
+          mensaje.textContent = "❌ " + result.message;
+          mensaje.style.color = "red";
+        }
+
+      } catch (error) {
+        console.error("Error completo:", error);
+        mensaje.textContent = "⚠️ Error de conexión. Intenta nuevamente.";
+        mensaje.style.color = "orange";
+      }
     }
-  }
-}
+
+    // Permitir login con Enter
+    document.getElementById("pass").addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        login();
+      }
+    });
   </script>
 </body>
 </html>
+
 
 
 
