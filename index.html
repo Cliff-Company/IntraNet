@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login IntraNET Cliff</title>
   <style>
-    /* Tus estilos actuales están bien */
     body {
       font-family: Arial, sans-serif;
       background: linear-gradient(to right, #243B55, #141E30);
@@ -41,6 +40,7 @@
       border-radius: 5px;
       cursor: pointer;
       transition: background 0.3s;
+      width: 100%;
     }
     button:hover {
       background: #019870;
@@ -48,23 +48,42 @@
     #mensaje {
       margin-top: 15px;
       font-weight: bold;
+      min-height: 20px;
+    }
+    .hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
   <div class="login-box">
     <h2>IntraNET Cliff</h2>
+    
+    <!-- Formulario oculto para enviar a Google Apps Script -->
+    <form id="googleForm" action="https://script.google.com/macros/s/AKfycbyQJsGdEwhUKNp-WLK7R9P-Zgw2kZgY8sDnUFvJWAxfzRg2yX5P34Vjq6j3l29p3EuJ2g/exec" method="POST" target="hiddenFrame">
+      <input type="hidden" name="user" id="formUser">
+      <input type="hidden" name="pass" id="formPass">
+    </form>
+    
+    <iframe name="hiddenFrame" class="hidden"></iframe>
+    
     <input type="text" id="user" placeholder="Usuario" />
     <input type="password" id="pass" placeholder="Contraseña" />
-    <button onclick="login()">Ingresar</button>
+    <button onclick="procesarLogin()">Ingresar</button>
     <div id="mensaje"></div>
   </div>
 
   <script>
-    // 🔧 REEMPLAZA ESTA URL con tu NUEVA URL de Web App
-    const scriptURL = "https://script.google.com/macros/s/AKfycbyQJsGdEwhUKNp-WLK7R9P-Zgw2kZgY8sDnUFvJWAxfzRg2yX5P34Vjq6j3l29p3EuJ2g/exec";
+    // 🔧 SOLUCIÓN HÍBRIDA: Validación local + Registro en Google Sheets
+    
+    // Usuarios válidos (mantén esta lista actualizada con tu Google Sheets)
+    const usuariosValidos = [
+      { usuario: "admin", password: "8909" },
+      { usuario: "Ejecutivo1", password: "1105" }
+      // AGREGA MÁS USUARIOS SEGÚN TU SHEETS
+    ];
 
-    async function login() {
+    async function procesarLogin() {
       const user = document.getElementById("user").value.trim();
       const pass = document.getElementById("pass").value.trim();
       const mensaje = document.getElementById("mensaje");
@@ -78,49 +97,56 @@
         return;
       }
 
-      try {
-        console.log("Enviando solicitud a:", scriptURL);
+      // 1. Validación local inmediata
+      const usuarioEncontrado = usuariosValidos.find(u => 
+        u.usuario.toLowerCase() === user.toLowerCase() && 
+        u.password === pass
+      );
+
+      if (usuarioEncontrado) {
+        mensaje.textContent = "✅ Acceso permitido, registrando...";
+        mensaje.style.color = "lightgreen";
         
-        const response = await fetch(scriptURL, {
-          method: "POST",
-          headers: { 
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ user, pass })
-        });
+        // 2. Registrar en Google Sheets (en segundo plano)
+        registrarEnGoogleSheets(user, "Correcto");
+        
+        setTimeout(() => {
+          window.location.href = "intranet.html?user=" + encodeURIComponent(user);
+        }, 1500);
+      } else {
+        mensaje.textContent = "❌ Usuario o contraseña incorrectos";
+        mensaje.style.color = "red";
+        
+        // Registrar intento fallido
+        registrarEnGoogleSheets(user, "Incorrecto");
+      }
+    }
 
-        const result = await response.json();
-        console.log("Respuesta recibida:", result);
-
-        if (result.success) {
-          mensaje.textContent = "✅ " + result.message;
-          mensaje.style.color = "lightgreen";
-          
-          setTimeout(() => {
-            window.location.href = "intranet.html";
-          }, 1500);
-        } else {
-          mensaje.textContent = "❌ " + result.message;
-          mensaje.style.color = "red";
-        }
-
+    // Función para registrar en Google Sheets usando Form Submission
+    function registrarEnGoogleSheets(usuario, acceso) {
+      try {
+        document.getElementById('formUser').value = usuario;
+        document.getElementById('formPass').value = '***'; // No enviar contraseña real por seguridad
+        document.getElementById('googleForm').submit();
+        console.log("📝 Registro enviado a Google Sheets:", usuario, acceso);
       } catch (error) {
-        console.error("Error completo:", error);
-        mensaje.textContent = "⚠️ Error de conexión. Intenta nuevamente.";
-        mensaje.style.color = "orange";
+        console.log("⚠️ No se pudo registrar en Sheets, pero login exitoso");
       }
     }
 
     // Permitir login con Enter
     document.getElementById("pass").addEventListener("keypress", function(event) {
       if (event.key === "Enter") {
-        login();
+        procesarLogin();
       }
     });
+
+    // Mostrar mensaje de error si viene por URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('error') === 'credenciales_incorrectas') {
+      document.getElementById('mensaje').textContent = '❌ Credenciales incorrectas';
+      document.getElementById('mensaje').style.color = 'red';
+    }
   </script>
 </body>
 </html>
-
-
-
-
