@@ -64,48 +64,83 @@
     const proxy = "https://api.allorigins.win/raw?url=";
 
     async function login() {
-      const user = document.getElementById("user").value.trim();
-      const pass = document.getElementById("pass").value.trim();
-      const mensaje = document.getElementById("mensaje");
+  const user = document.getElementById("user").value.trim();
+  const pass = document.getElementById("pass").value.trim();
+  const mensaje = document.getElementById("mensaje");
 
-      mensaje.textContent = "Verificando...";
-      mensaje.style.color = "yellow";
+  mensaje.textContent = "Verificando...";
+  mensaje.style.color = "yellow";
 
-      if (!user || !pass) {
-        mensaje.textContent = "Completa los campos.";
-        mensaje.style.color = "orange";
-        return;
-      }
+  if (!user || !pass) {
+    mensaje.textContent = "Completa los campos.";
+    mensaje.style.color = "orange";
+    return;
+  }
 
-      try {
-       const response = await fetch(proxy + encodeURIComponent(scriptURL), {
-       method: "POST",
-       headers: { "Content-Type": "application/json" },
-       body: JSON.stringify({ user, pass })
-     });
+  try {
+    // Usar fetch directamente sin proxy si es posible
+    const response = await fetch(scriptURL, {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({ user, pass })
+    });
 
-        const result = await response.json();
-        console.log(result);
+    const result = await response.json();
+    console.log("Respuesta del servidor:", result);
 
-        if (result.success) {
-          mensaje.textContent = "✅ " + result.message;
-          mensaje.style.color = "lightgreen";
-          setTimeout(() => {
-            window.location.href = "intranet.html";
-          }, 1500);
-        } else {
-          mensaje.textContent = "❌ " + result.message;
-          mensaje.style.color = "red";
-        }
+    if (result.success) {
+      mensaje.textContent = "✅ " + result.message;
+      mensaje.style.color = "lightgreen";
+      
+      // 🔧 Agregar verificación adicional
+      setTimeout(() => {
+        console.log("Redirigiendo a intranet.html...");
+        // Verificar si el archivo existe
+        window.location.href = "intranet.html";
+      }, 1500);
+      
+    } else {
+      mensaje.textContent = "❌ " + result.message;
+      mensaje.style.color = "red";
+    }
 
-      } catch (error) {
-        console.error(error);
-        mensaje.textContent = "Error al conectar con el servidor.";
+  } catch (error) {
+    console.error("Error completo:", error);
+    // 🔧 Intentar con el proxy como fallback
+    try {
+      const proxyResponse = await fetch(proxy + encodeURIComponent(scriptURL), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user, pass })
+      });
+      
+      const proxyResult = await proxyResponse.json();
+      console.log("Respuesta via proxy:", proxyResult);
+      
+      if (proxyResult.success) {
+        mensaje.textContent = "✅ " + proxyResult.message;
+        mensaje.style.color = "lightgreen";
+        setTimeout(() => {
+          window.location.href = "intranet.html";
+        }, 1500);
+      } else {
+        mensaje.textContent = "❌ " + proxyResult.message;
         mensaje.style.color = "red";
       }
+      
+    } catch (proxyError) {
+      console.error("Error con proxy:", proxyError);
+      mensaje.textContent = "Error al conectar con el servidor.";
+      mensaje.style.color = "red";
     }
+  }
+}
   </script>
 </body>
 </html>
+
 
 
