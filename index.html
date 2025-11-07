@@ -61,7 +61,7 @@
 
   <script>
     const scriptURL = "https://script.google.com/macros/s/AKfycbzJ7qJSSU9d81QdQqeae-5Fe9ZXRO7YzEoMweLH_GND72kFeSYdz0M3fKWZ1hc7VJ1ltg/exec";
-    const proxy = "https://corsproxy.io/?";
+    const proxy = "https://api.allorigins.win/raw?url=";
 
     async function login() {
       const user = document.getElementById("user").value.trim();
@@ -78,11 +78,11 @@
       }
 
       try {
-        const response = await fetch(`${proxy}${scriptURL}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ user, pass })
-        });
+       const response = await fetch(proxy + encodeURIComponent(scriptURL), {
+       method: "POST",
+       headers: { "Content-Type": "application/json" },
+       body: JSON.stringify({ user, pass })
+     });
 
         const result = await response.json();
         console.log(result);
@@ -107,3 +107,4 @@
   </script>
 </body>
 </html>
+
