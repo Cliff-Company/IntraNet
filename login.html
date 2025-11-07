@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login IntraNET Cliff</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #243B55, #141E30);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-box {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
+      width: 300px;
+    }
+    input {
+      display: block;
+      width: 90%;
+      margin: 10px auto;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+    }
+    button {
+      background: #00b894;
+      border: none;
+      padding: 10px 15px;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #019870;
+    }
+    #mensaje {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>IntraNET Cliff</h2>
+    <input type="text" id="user" placeholder="Usuario" />
+    <input type="password" id="pass" placeholder="Contraseña" />
+    <button onclick="login()">Ingresar</button>
+    <div id="mensaje"></div>
+  </div>
+
+  <script>
+    const scriptURL = "https://script.google.com/macros/s/AKfycbzJ7qJSSU9d81QdQqeae-5Fe9ZXRO7YzEoMweLH_GND72kFeSYdz0M3fKWZ1hc7VJ1ltg/exec";
+    const proxy = "https://corsproxy.io/?";
+
+    async function login() {
+      const user = document.getElementById("user").value.trim();
+      const pass = document.getElementById("pass").value.trim();
+      const mensaje = document.getElementById("mensaje");
+
+      mensaje.textContent = "Verificando...";
+      mensaje.style.color = "yellow";
+
+      if (!user || !pass) {
+        mensaje.textContent = "Completa los campos.";
+        mensaje.style.color = "orange";
+        return;
+      }
+
+      try {
+        const response = await fetch(`${proxy}${scriptURL}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user, pass })
+        });
+
+        const result = await response.json();
+        console.log(result);
+
+        if (result.success) {
+          mensaje.textContent = "✅ " + result.message;
+          mensaje.style.color = "lightgreen";
+          setTimeout(() => {
+            window.location.href = "intranet.html";
+          }, 1500);
+        } else {
+          mensaje.textContent = "❌ " + result.message;
+          mensaje.style.color = "red";
+        }
+
+      } catch (error) {
+        console.error(error);
+        mensaje.textContent = "Error al conectar con el servidor.";
+        mensaje.style.color = "red";
+      }
+    }
+  </script>
+</body>
+</html>
