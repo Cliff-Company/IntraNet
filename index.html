@@ -50,22 +50,11 @@
       font-weight: bold;
       min-height: 20px;
     }
-    .hidden {
-      display: none;
-    }
   </style>
 </head>
 <body>
   <div class="login-box">
     <h2>IntraNET Cliff</h2>
-    
-    <!-- Formulario oculto para enviar a Google Apps Script -->
-    <form id="googleForm" action="https://script.google.com/macros/s/AKfycbyQJsGdEwhUKNp-WLK7R9P-Zgw2kZgY8sDnUFvJWAxfzRg2yX5P34Vjq6j3l29p3EuJ2g/exec" method="POST" target="hiddenFrame">
-      <input type="hidden" name="user" id="formUser">
-      <input type="hidden" name="pass" id="formPass">
-    </form>
-    
-    <iframe name="hiddenFrame" class="hidden"></iframe>
     
     <input type="text" id="user" placeholder="Usuario" />
     <input type="password" id="pass" placeholder="Contraseña" />
@@ -74,13 +63,14 @@
   </div>
 
   <script>
-    // 🔧 SOLUCIÓN HÍBRIDA: Validación local + Registro en Google Sheets
+    // 🔧 URL de tu Google Apps Script para registros
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwGmb0xD0ydNgdSmsd8pYwAMYMMmNRr7aNb0JG8RZWPzXrUCKykNcJXOoqhVBmy3D26sg/exec";
     
-    // Usuarios válidos (mantén esta lista actualizada con tu Google Sheets)
+    // 🔧 USUARIOS VÁLIDOS - ACTUALIZA CON TUS USUARIOS REALES
     const usuariosValidos = [
       { usuario: "admin", password: "8909" },
-      { usuario: "Ejecutivo1", password: "1105" }
-      // AGREGA MÁS USUARIOS SEGÚN TU SHEETS
+      { usuario: "cliff", password: "cliff2024" }
+      // AGREGA MÁS USUARIOS AQUÍ
     ];
 
     async function procesarLogin() {
@@ -97,40 +87,70 @@
         return;
       }
 
-      // 1. Validación local inmediata
+      // Validación local
       const usuarioEncontrado = usuariosValidos.find(u => 
         u.usuario.toLowerCase() === user.toLowerCase() && 
         u.password === pass
       );
 
       if (usuarioEncontrado) {
-        mensaje.textContent = "✅ Acceso permitido, registrando...";
+        mensaje.textContent = "✅ Acceso permitido";
         mensaje.style.color = "lightgreen";
         
-        // 2. Registrar en Google Sheets (en segundo plano)
-        registrarEnGoogleSheets(user, "Correcto");
+        // 🔧 REGISTRAR EN GOOGLE SHEETS - CORRECTO
+        registrarEnGoogleSheets(user, pass, "Correcto");
         
         setTimeout(() => {
           window.location.href = "intranet.html?user=" + encodeURIComponent(user);
         }, 1500);
+        
       } else {
         mensaje.textContent = "❌ Usuario o contraseña incorrectos";
         mensaje.style.color = "red";
         
-        // Registrar intento fallido
-        registrarEnGoogleSheets(user, "Incorrecto");
+        // 🔧 REGISTRAR EN GOOGLE SHEETS - INCORRECTO
+        registrarEnGoogleSheets(user, pass, "Incorrecto");
       }
     }
 
-    // Función para registrar en Google Sheets usando Form Submission
-    function registrarEnGoogleSheets(usuario, acceso) {
+    // 🔧 FUNCIÓN MEJORADA para registrar en Google Sheets
+    function registrarEnGoogleSheets(usuario, password, resultado) {
       try {
-        document.getElementById('formUser').value = usuario;
-        document.getElementById('formPass').value = '***'; // No enviar contraseña real por seguridad
-        document.getElementById('googleForm').submit();
-        console.log("📝 Registro enviado a Google Sheets:", usuario, acceso);
+        console.log("📤 Enviando registro:", usuario, resultado);
+        
+        // 🔧 MÉTODO 1: Usar Image (más confiable para CORS)
+        const img = new Image();
+        const url = `${scriptURL}?user=${encodeURIComponent(usuario)}&pass=${encodeURIComponent(password)}&resultado=${resultado}&timestamp=${Date.now()}`;
+        img.src = url;
+        
+        console.log("✅ Registro enviado via imagen:", usuario, resultado);
+        return true;
+        
       } catch (error) {
-        console.log("⚠️ No se pudo registrar en Sheets, pero login exitoso");
+        console.log("⚠️ Error en registro (no crítico):", error);
+        return false;
+      }
+    }
+
+    // 🔧 ALTERNATIVA: Usar fetch con no-cors
+    async function registrarEnGoogleSheetsFetch(usuario, password, resultado) {
+      try {
+        const formData = new URLSearchParams();
+        formData.append('user', usuario);
+        formData.append('pass', password);
+        formData.append('resultado', resultado);
+        
+        const response = await fetch(scriptURL, {
+          method: 'POST',
+          body: formData,
+          mode: 'no-cors'
+        });
+        
+        console.log("✅ Registro enviado via fetch:", usuario);
+        return true;
+      } catch (error) {
+        console.log("⚠️ Error registro fetch:", error);
+        return false;
       }
     }
 
@@ -141,13 +161,18 @@
       }
     });
 
-    // Mostrar mensaje de error si viene por URL
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('error') === 'credenciales_incorrectas') {
-      document.getElementById('mensaje').textContent = '❌ Credenciales incorrectas';
-      document.getElementById('mensaje').style.color = 'red';
+    // Cargar usuarios desde parámetros URL (opcional)
+    function cargarUsuarioDesdeURL() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const userParam = urlParams.get('user');
+      if (userParam) {
+        document.getElementById('user').value = userParam;
+      }
     }
+
+    window.addEventListener('load', cargarUsuarioDesdeURL);
   </script>
 </body>
 </html>
+
 
