@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Actualizar Imagen</title>
+<style>
+  #dropzone {
+    width: 300px;
+    height: 200px;
+    border: 2px dashed #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  #dropzone.dragover {
+    background: #eee;
+  }
+</style>
+</head>
+
+<body>
+
+<h3>Actualizar imagen</h3>
+
+<div id="dropzone">Arrastra la imagen aquí</div>
+<img id="preview" width="300" style="display:none;margin-top:10px;">
+<br><br>
+<button id="uploadBtn" disabled>Actualizar</button>
+
+<script>
+let file;
+
+const dropzone = document.getElementById('dropzone');
+const preview = document.getElementById('preview');
+const btn = document.getElementById('uploadBtn');
+
+dropzone.addEventListener('dragover', e => {
+  e.preventDefault();
+  dropzone.classList.add('dragover');
+});
+
+dropzone.addEventListener('dragleave', () => {
+  dropzone.classList.remove('dragover');
+});
+
+dropzone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropzone.classList.remove('dragover');
+
+  file = e.dataTransfer.files[0];
+  if (!file.type.startsWith('image/')) {
+    alert('Solo imágenes');
+    return;
+  }
+
+  preview.src = URL.createObjectURL(file);
+  preview.style.display = 'block';
+  btn.disabled = false;
+});
+
+btn.onclick = async () => {
+  const formData = new FormData();
+  formData.append('imagen', file);
+
+  const res = await fetch('upload.php', {
+    method: 'POST',
+    body: formData
+  });
+
+  const data = await res.text();
+  alert(data);
+};
+</script>
+
+</body>
+</html>

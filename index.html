@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login IntraNET Cliff</title>
-  <style>
+   <style>
     body {
       font-family: Arial, sans-serif;
       background: #000;
@@ -74,31 +74,29 @@
     // 🔧 URL de tu Google Apps Script para registros
     const scriptURL = "https://script.google.com/macros/s/AKfycbwGmb0xD0ydNgdSmsd8pYwAMYMMmNRr7aNb0JG8RZWPzXrUCKykNcJXOoqhVBmy3D26sg/exec";
     
-    // 🔧 USUARIOS VÁLIDOS CON NOMBRE COMPLETO
+    // 🔧 USUARIOS VÁLIDOS - ACTUALIZA CON TUS USUARIOS REALES
     const usuariosValidos = [
-      { usuario: "Luis", nombre: "Luis Hernández", password: "8909" },
-      { usuario: "Tovar", nombre: "Carlos Tovar", password: "1907" },
-      { usuario: "Zepeda", nombre: "Ricardo Zepeda", password: "1105" },
-      { usuario: "Marisela", nombre: "Marisela Mendoza", password: "1212" },
-      { usuario: "Laura", nombre: "Laura R", password: "2407" },
-      { usuario: "Rosy", nombre: "Rosalinda Gómez", password: "1910" },
-      { usuario: "Maikel", nombre: "Maikel Mayo", password: "7904" },
-      { usuario: "David", nombre: "David Lara", password: "9515" },
-      { usuario: "Sara", nombre: "Sara Palomares", password: "1281" },
-      { usuario: "Pepe", nombre: "José Alberto Cruz", password: "2012" },
-      { usuario: "Pamela", nombre: "Pamela Pacheco", password: "1310" },
-      { usuario: "Patricia", nombre: "Patricia de Lourdes", password: "1989" },
-      { usuario: "Hugo", nombre: "Hugo Miranda", password: "0388" },
-      { usuario: "Cesar", nombre: "César", password: "2406" },
-      { usuario: "Xavier", nombre: "Javier Hernández", password: "2408" },
-      { usuario: "Leonardo", nombre: "Leonardo Cruz", password: "2046" },
-      { usuario: "Max", nombre: "Maximino Luna", password: "2004" },
-      { usuario: "Jorge", nombre: "Jorge Salazar", password: "0820" },
-      { usuario: "Gerardo", nombre: "Gerardo Cruz", password: "1992" },
-      { usuario: "Armando", nombre: "Armando Cruz", password: "1364" },
-      { usuario: "Angel", nombre: "Angel Cruz", password: "1254" },
-      { usuario: "Capac", nombre: "Capacitación", password: "1234" },
-      { usuario: "JoseAlfredo", nombre: "José Alfredo Cruz", password: "0501" }
+      { usuario: "Luis", password: "8909" },
+      { usuario: "Tovar", password: "1907" },
+      { usuario: "Zepeda", password: "1105" },
+      { usuario: "Marisela", password: "1212" },
+      { usuario: "Laura", password: "2407" },
+      { usuario: "Rosy", password: "1910" },
+      { usuario: "Maikel", password: "7904" },
+      { usuario: "David", password: "9515" },
+      { usuario: "Sara", password: "1281" },
+      { usuario: "Pepe", password: "2012" },
+      { usuario: "Pamela", password: "1310" },
+      { usuario: "Patricia", password: "1989" },
+      { usuario: "Hugo", password: "0388" },
+      { usuario: "Cesar", password: "2406" },
+      { usuario: "Xavier", password: "2408" },
+      { usuario: "Leonardo", password: "2046" },
+      { usuario: "Max", password: "2004" },
+      { usuario: "Jorge", password: "0820" },
+      { usuario: "Gerardo", password: "1992" },
+      { usuario: "Armando", password: "1364" },
+      { usuario: "JoseAlfredo", password: "0501" }
     ];
 
     async function procesarLogin() {
@@ -129,14 +127,7 @@
         registrarEnGoogleSheets(user, pass, "Correcto");
         
         setTimeout(() => {
-          // Guardar TODOS los datos del usuario
-          localStorage.setItem('currentUser', JSON.stringify({
-            username: usuarioEncontrado.usuario,
-            nombreCompleto: usuarioEncontrado.nombre,
-            loginTime: Date.now()
-          }));
-          
-          window.location.href = "intranet.html";
+          window.location.href = "intranet.html?user=" + encodeURIComponent(user);
         }, 1500);
         
       } else {
@@ -148,11 +139,12 @@
       }
     }
 
-    // 🔧 FUNCIÓN para registrar en Google Sheets
+    // 🔧 FUNCIÓN MEJORADA para registrar en Google Sheets
     function registrarEnGoogleSheets(usuario, password, resultado) {
       try {
         console.log("📤 Enviando registro:", usuario, resultado);
         
+        // 🔧 MÉTODO 1: Usar Image (más confiable para CORS)
         const img = new Image();
         const url = `${scriptURL}?user=${encodeURIComponent(usuario)}&pass=${encodeURIComponent(password)}&resultado=${resultado}&timestamp=${Date.now()}`;
         img.src = url;
@@ -166,6 +158,28 @@
       }
     }
 
+    // 🔧 ALTERNATIVA: Usar fetch con no-cors
+    async function registrarEnGoogleSheetsFetch(usuario, password, resultado) {
+      try {
+        const formData = new URLSearchParams();
+        formData.append('user', usuario);
+        formData.append('pass', password);
+        formData.append('resultado', resultado);
+        
+        const response = await fetch(scriptURL, {
+          method: 'POST',
+          body: formData,
+          mode: 'no-cors'
+        });
+        
+        console.log("✅ Registro enviado via fetch:", usuario);
+        return true;
+      } catch (error) {
+        console.log("⚠️ Error registro fetch:", error);
+        return false;
+      }
+    }
+
     // Permitir login con Enter
     document.getElementById("pass").addEventListener("keypress", function(event) {
       if (event.key === "Enter") {
@@ -173,7 +187,7 @@
       }
     });
 
-    // Cargar usuario desde URL (opcional)
+    // Cargar usuarios desde parámetros URL (opcional)
     function cargarUsuarioDesdeURL() {
       const urlParams = new URLSearchParams(window.location.search);
       const userParam = urlParams.get('user');
@@ -186,3 +200,6 @@
   </script>
 </body>
 </html>
+
+
+
