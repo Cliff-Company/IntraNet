@@ -1327,7 +1327,7 @@
         </div>
     </div>
 
-    <!-- Modal Excel Identidad -->
+<!-- Modal Excel Identidad -->
 <div class="modal-overlay" id="excelModal">
     <div class="modal-content">
         <h3 class="modal-title">Excel Identificación de Actividades</h3>
@@ -1336,9 +1336,9 @@
         <input type="file" id="excelFileInput" class="hidden-file-input" accept=".xlsx,.xls">
 
         <div class="modal-buttons" style="flex-wrap: wrap;">
-            <button class="modal-btn" id="downloadExcel">Descargar</button>
-            <button class="modal-btn" id="uploadExcel">Subir</button>
-            <button class="modal-btn cancel" id="cancelDownload">Cancelar</button>
+            <button class="modal-btn" id="downloadExcel" type="button">Descargar</button>
+            <button class="modal-btn" id="uploadExcel" type="button">Subir</button>
+            <button class="modal-btn cancel" id="cancelExcel" type="button">Cancelar</button>
         </div>
     </div>
 </div>
@@ -2484,31 +2484,55 @@ const GOOGLE_DRIVE_FOLDER_ID = "16YgUjEwgxWz3ANPYlJ6dICMXCNyhmN5y";
 function showExcelModal() {
     const modal = document.getElementById("excelModal");
     const fileInput = document.getElementById("excelFileInput");
+    const downloadBtn = document.getElementById("downloadExcel");
+    const uploadBtn = document.getElementById("uploadExcel");
+    const cancelBtn = document.getElementById("cancelExcel");
 
     modal.classList.add("active");
 
-    document.getElementById("downloadExcel").onclick = () => {
+    downloadBtn.onclick = () => {
         window.open(EXCEL_IDENTIDAD_DOWNLOAD_URL, "_blank");
     };
 
-    document.getElementById("uploadExcel").onclick = () => {
+    uploadBtn.onclick = () => {
+        fileInput.value = "";
         fileInput.click();
     };
 
-    document.getElementById("cancelExcel").onclick = () => {
+    cancelBtn.onclick = () => {
         modal.classList.remove("active");
     };
 
     modal.onclick = (e) => {
-        if (e.target === modal) modal.classList.remove("active");
+        if (e.target === modal) {
+            modal.classList.remove("active");
+        }
     };
 
     fileInput.onchange = async (e) => {
-        const file = e.target.files[0];
+        const file = e.target.files?.[0];
         if (!file) return;
 
-        await subirExcel(file);
-        modal.classList.remove("active");
+        try {
+            uploadBtn.disabled = true;
+            uploadBtn.innerHTML = '<span class="loading"></span> Subiendo...';
+
+            const resultado = await subirExcel(file);
+
+            if (resultado?.ok) {
+                mostrarNotificacion(`✅ Archivo subido correctamente: ${resultado.fileName || file.name}`);
+                modal.classList.remove("active");
+            } else {
+                throw new Error(resultado?.error || "No se pudo subir el archivo");
+            }
+        } catch (error) {
+            console.error("Error al subir:", error);
+            mostrarNotificacion(`❌ ${error.message || "Error al subir archivo"}`, "error");
+        } finally {
+            uploadBtn.disabled = false;
+            uploadBtn.textContent = "Subir";
+            fileInput.value = "";
+        }
     };
 }
 
