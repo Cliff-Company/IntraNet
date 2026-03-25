@@ -2477,7 +2477,7 @@
         }
 
         const EXCEL_IDENTIDAD_DOWNLOAD_URL = "https://drive.google.com/uc?export=download&id=18M7Zhl-WSsfyBaCvuL0oqodp0N_9dD9U";   
-const GOOGLE_UPLOAD_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxZ9f5MaN1koHPe9bYWX7mmpOz5QIAYAX1EkHnnq7ri4zYzEuXEHBX6KG1rHcpjrsYzCw/exec";
+const GOOGLE_UPLOAD_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwsbv06rFGNzul0-SDAV1iOmaDwn4Nh-f6zohf0wEBPjZCnogks13cywOfA_VrdHK47Ng/exec";
 const GOOGLE_DRIVE_FOLDER_ID = "13Yh0XOTX8-5FE-WhUSGZQYpiW1GhthWo";
 
 /* ========= ABRIR MODAL ========= */
@@ -2517,32 +2517,49 @@ async function subirExcel(file) {
     const user = obtenerUsuarioActual();
 
     const nombre = (user?.nombreCompleto || user?.username || "usuario")
-        .replace(/\s+/g, "_");
+        .replace(/\s+/g, "_")
+        .replace(/[^\w\u00C0-\u017F-]/g, "");
 
     const fecha = new Date().toISOString().split("T")[0];
-    const ext = file.name.split(".").pop();
-
+    const ext = (file.name.split(".").pop() || "xlsx").toLowerCase();
     const fileName = `${nombre}_${fecha}.${ext}`;
 
     const base64 = await new Promise((res, rej) => {
         const r = new FileReader();
-        r.onload = () => res(r.result.split(",")[1]);
+        r.onload = () => res(String(r.result).split(",")[1]);
         r.onerror = rej;
         r.readAsDataURL(file);
     });
 
-    await fetch(GOOGLE_UPLOAD_WEBAPP_URL, {
+    const response = await fetch(GOOGLE_UPLOAD_WEBAPP_URL, {
         method: "POST",
-        headers: { "Content-Type": "text/plain" },
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
             fileName,
             base64,
-            mimeType: file.type,
-            folderId: GOOGLE_DRIVE_FOLDER_ID
+            mimeType: file.type || "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            folderId: GOOGLE_DRIVE_FOLDER_ID,
+            username: user?.username || "",
+            nombreCompleto: user?.nombreCompleto || ""
         })
     });
 
-    mostrarNotificacion("✅ Archivo subido");
+    const text = await response.text();
+    let result;
+
+    try {
+        result = JSON.parse(text);
+    } catch {
+        throw new Error("La respuesta del Web App no fue JSON válido: " + text);
+    }
+
+    console.log("Respuesta del Web App:", result);
+
+    if (!result.ok) {
+        throw new Error(result.error || "No se pudo subir el archivo");
+    }
+
+    mostrarNotificacion(`✅ Archivo subido: ${result.fileName}`);
 }
 
     </script>
