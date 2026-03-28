@@ -2519,12 +2519,9 @@ function showExcelModal() {
 
             const resultado = await subirExcel(file);
 
-            if (resultado?.ok) {
-                mostrarNotificacion(`✅ Archivo subido correctamente: ${resultado.fileName || file.name}`);
-                modal.classList.remove("active");
-            } else {
-                throw new Error(resultado?.error || "No se pudo subir el archivo");
-            }
+            mostrarNotificacion(`✅ Archivo subido correctamente: ${resultado.fileName || file.name}`);
+            modal.classList.remove("active");
+
         } catch (error) {
             console.error("Error al subir:", error);
             mostrarNotificacion(`❌ ${error.message || "Error al subir archivo"}`, "error");
@@ -2541,12 +2538,14 @@ async function subirExcel(file) {
     const user = obtenerUsuarioActual();
 
     const nombre = (user?.nombreCompleto || user?.username || "usuario")
-        .replace(/\s+/g, "_")
-        .replace(/[^\w\u00C0-\u017F-]/g, "");
+        .trim()
+        .replace(/\s+/g, " ")
+        .replace(/[\\/:*?"<>|]/g, "");
 
-    const fecha = new Date().toISOString().split("T")[0];
     const ext = (file.name.split(".").pop() || "xlsx").toLowerCase();
-    const fileName = `${nombre}_${fecha}.${ext}`;
+    const extensionFinal = ext ? `.${ext}` : ".xlsx";
+
+    const fileName = `FORMATO IDENTIFICACION ACTIVIDADES (${nombre})${extensionFinal}`;
 
     const base64 = await new Promise((res, rej) => {
         const r = new FileReader();
@@ -2583,9 +2582,8 @@ async function subirExcel(file) {
         throw new Error(result.error || "No se pudo subir el archivo");
     }
 
-    mostrarNotificacion(`✅ Archivo subido: ${result.fileName}`);
+    return result;
 }
-
     </script>
 </body>
 
