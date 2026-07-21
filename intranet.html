@@ -2516,19 +2516,13 @@
         function showPRPModal() {
 
     const modal = document.getElementById("prpModal");
-
     const downloadBtn = document.getElementById("downloadPRP");
-    const watchBtn = document.getElementById("watchPRP");
     const cancelBtn = document.getElementById("cancelPRP");
 
     modal.classList.add("active");
 
     downloadBtn.onclick = () => {
         window.open(PRP_DOWNLOAD_URL, "_blank");
-    };
-
-    watchBtn.onclick = () => {
-        window.open(PRP_VIDEO_URL, "_blank");
     };
 
     cancelBtn.onclick = () => {
