@@ -1362,6 +1362,26 @@
     </div>
 </div>
 
+    <!-- Modal Formato Juntas -->
+<div class="modal-overlay" id="juntasModal">
+    <div class="modal-content">
+        <h3 class="modal-title">Formato Convocatoria Juntas</h3>
+        <p class="modal-text">
+            Selecciona la acción que deseas realizar.
+        </p>
+
+        <div class="modal-buttons" style="flex-wrap: wrap;">
+            <button class="modal-btn" id="downloadJuntas" type="button">
+                Descargar documento
+            </button>
+
+            <button class="modal-btn cancel" id="cancelJuntas" type="button">
+                Cancelar
+            </button>
+        </div>
+    </div>
+</div>
+
     <script>
         // ========== CONFIGURACIÓN DE ROLES ==========
         const permisosPorRol = {
@@ -1888,6 +1908,12 @@
                     Descarga la información sobre el Método PRP.
                 </div>
             </div>
+           <div class="documento-card" id="JUNTAS">
+    <div class="documento-card-title">Formato Juntas</div>
+    <div class="documento-card-text">
+        Descarga el formato de convocatoria de juntas.
+    </div>
+</div>
         </div>
     </div>
 `,
@@ -2224,6 +2250,11 @@
             prp.onclick = showPRPModal;
         }
 
+        const juntas = document.getElementById("JUNTAS");
+        if (juntas) {
+            juntas.onclick = showJuntasModal;
+        }
+
     }, 100);
 }
 
@@ -2512,6 +2543,7 @@
         const GOOGLE_UPLOAD_WEBAPP_URL = "https://script.google.com/macros/s/AKfycby_Cu49lS6YSa_GudtUJkf8uNpTWVpYvffKIDjyGiEbLVrprc4Hr1xg4-pxX1BNBggC-Q/exec";
         const GOOGLE_DRIVE_FOLDER_ID = "16YgUjEwgxWz3ANPYlJ6dICMXCNyhmN5y"; 
         const PRP_DOWNLOAD_URL = "https://drive.google.com/file/d/1JqFjbWVC9jvsf1_r0Q3OtVVhlQ67Q7QK/view?usp=drive_link";
+        const JUNTAS_DOWNLOAD_URL = "https://docs.google.com/document/d/1CkE6c5irBprqqko2f1wvmekqf0CySYor/edit?usp=drive_link&ouid=105712656672869937164&rtpof=true&sd=true";
 
         function showPRPModal() {
 
@@ -2585,6 +2617,29 @@ function showExcelModal() {
             uploadBtn.disabled = false;
             uploadBtn.textContent = "Subir";
             fileInput.value = "";
+        }
+    };
+}
+
+       function showJuntasModal() {
+
+    const modal = document.getElementById("juntasModal");
+    const downloadBtn = document.getElementById("downloadJuntas");
+    const cancelBtn = document.getElementById("cancelJuntas");
+
+    modal.classList.add("active");
+
+    downloadBtn.onclick = () => {
+        window.open(JUNTAS_DOWNLOAD_URL, "_blank");
+    };
+
+    cancelBtn.onclick = () => {
+        modal.classList.remove("active");
+    };
+
+    modal.onclick = (e) => {
+        if (e.target === modal) {
+            modal.classList.remove("active");
         }
     };
 }
