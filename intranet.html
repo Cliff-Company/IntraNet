@@ -1342,6 +1342,26 @@
     </div>
 </div>
 
+    <!-- Modal Método PRP -->
+<div class="modal-overlay" id="prpModal">
+    <div class="modal-content">
+        <h3 class="modal-title">Método PRP</h3>
+        <p class="modal-text">
+            Selecciona la acción que deseas realizar.
+        </p>
+
+        <div class="modal-buttons" style="flex-wrap: wrap;">
+            <button class="modal-btn" id="downloadPRP" type="button">
+                Descargar documento
+            </button>
+
+            <button class="modal-btn cancel" id="cancelPRP" type="button">
+                Cancelar
+            </button>
+        </div>
+    </div>
+</div>
+
     <script>
         // ========== CONFIGURACIÓN DE ROLES ==========
         const permisosPorRol = {
@@ -1862,6 +1882,12 @@
                     Descarga la plantilla oficial o sube tu archivo de Identificación de Actividades.
                 </div>
             </div>
+            <div class="documento-card" id="PRP">
+                <div class="documento-card-title">Método PRP</div>
+                <div class="documento-card-text">
+                    Descarga la información sobre el Método PRP.
+                </div>
+            </div>
         </div>
     </div>
 `,
@@ -2187,10 +2213,17 @@
 
             if (section === "avisos") {
     setTimeout(() => {
+
         const card = document.getElementById("excel-identidad-card");
         if (card) {
             card.onclick = showExcelModal;
         }
+
+        const prp = document.getElementById("PRP");
+        if (prp) {
+            prp.onclick = showPRPModal;
+        }
+
     }, 100);
 }
 
@@ -2476,8 +2509,38 @@
         }
 
         const EXCEL_IDENTIDAD_DOWNLOAD_URL = "https://drive.google.com/uc?export=download&id=1LStAGmFMShQa_JjRrlDO-TT7pNskt-7L";   
-const GOOGLE_UPLOAD_WEBAPP_URL = "https://script.google.com/macros/s/AKfycby_Cu49lS6YSa_GudtUJkf8uNpTWVpYvffKIDjyGiEbLVrprc4Hr1xg4-pxX1BNBggC-Q/exec";
-const GOOGLE_DRIVE_FOLDER_ID = "16YgUjEwgxWz3ANPYlJ6dICMXCNyhmN5y"; 
+        const GOOGLE_UPLOAD_WEBAPP_URL = "https://script.google.com/macros/s/AKfycby_Cu49lS6YSa_GudtUJkf8uNpTWVpYvffKIDjyGiEbLVrprc4Hr1xg4-pxX1BNBggC-Q/exec";
+        const GOOGLE_DRIVE_FOLDER_ID = "16YgUjEwgxWz3ANPYlJ6dICMXCNyhmN5y"; 
+        const PRP_DOWNLOAD_URL = "https://drive.google.com/file/d/1JqFjbWVC9jvsf1_r0Q3OtVVhlQ67Q7QK/view?usp=drive_link";
+
+        function showPRPModal() {
+
+    const modal = document.getElementById("prpModal");
+
+    const downloadBtn = document.getElementById("downloadPRP");
+    const watchBtn = document.getElementById("watchPRP");
+    const cancelBtn = document.getElementById("cancelPRP");
+
+    modal.classList.add("active");
+
+    downloadBtn.onclick = () => {
+        window.open(PRP_DOWNLOAD_URL, "_blank");
+    };
+
+    watchBtn.onclick = () => {
+        window.open(PRP_VIDEO_URL, "_blank");
+    };
+
+    cancelBtn.onclick = () => {
+        modal.classList.remove("active");
+    };
+
+    modal.onclick = (e) => {
+        if (e.target === modal) {
+            modal.classList.remove("active");
+        }
+    };
+}
 
 /* ========= ABRIR MODAL ========= */
 function showExcelModal() {
