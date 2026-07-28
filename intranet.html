@@ -1382,6 +1382,26 @@
     </div>
 </div>
 
+    <!-- Modal Promesa de Marca -->
+<div class="modal-overlay" id="promesaModal">
+    <div class="modal-content">
+        <h3 class="modal-title">Formato Promesa de Marca</h3>
+        <p class="modal-text">
+            Selecciona la acción que deseas realizar.
+        </p>
+
+        <div class="modal-buttons" style="flex-wrap: wrap;">
+            <button class="modal-btn" id="downloadPromesa" type="button">
+                Descargar documento
+            </button>
+
+            <button class="modal-btn cancel" id="cancelPromesa" type="button">
+                Cancelar
+            </button>
+        </div>
+    </div>
+</div>
+
     <script>
         // ========== CONFIGURACIÓN DE ROLES ==========
         const permisosPorRol = {
@@ -1915,6 +1935,12 @@
         Descarga el formato de convocatoria de juntas.
     </div>
 </div>
+<div class="documento-card" id="PROMESA">
+                <div class="documento-card-title">Promesa de Marca</div>
+                <div class="documento-card-text">
+                    Descarga la presentación sobre la promesa de marca.
+                </div>
+            </div>
         </div>
     </div>
 `,
@@ -2256,6 +2282,11 @@
             juntas.onclick = showJuntasModal;
         }
 
+        const promesa = document.getElementById("PROMESA");
+if (promesa) {
+    promesa.onclick = showPromesaModal;
+}
+
     }, 100);
 }
 
@@ -2545,6 +2576,7 @@
         const GOOGLE_DRIVE_FOLDER_ID = "16YgUjEwgxWz3ANPYlJ6dICMXCNyhmN5y"; 
         const PRP_DOWNLOAD_URL = "https://drive.google.com/uc?export=download&id=1JqFjbWVC9jvsf1_r0Q3OtVVhlQ67Q7QK";
         const JUNTAS_DOWNLOAD_URL = "https://drive.google.com/uc?export=download&id=1CkE6c5irBprqqko2f1wvmekqf0CySYor";
+        const PROMESA_MARCA_DOWNLOAD_URL = "https://drive.google.com/uc?export=download&id=1WxQHApAbjwecYacxtc-LBzGOkwkIFtvc";
 
         function showPRPModal() {
 
@@ -2632,6 +2664,29 @@ function showExcelModal() {
 
     downloadBtn.onclick = () => {
         window.open(JUNTAS_DOWNLOAD_URL, "_blank");
+    };
+
+    cancelBtn.onclick = () => {
+        modal.classList.remove("active");
+    };
+
+    modal.onclick = (e) => {
+        if (e.target === modal) {
+            modal.classList.remove("active");
+        }
+    };
+}
+
+        function showPromesaModal() {
+
+    const modal = document.getElementById("promesaModal");
+    const downloadBtn = document.getElementById("downloadPromesa");
+    const cancelBtn = document.getElementById("cancelPromesa");
+
+    modal.classList.add("active");
+
+    downloadBtn.onclick = () => {
+        window.open(PROMESA_MARCA_DOWNLOAD_URL, "_blank");
     };
 
     cancelBtn.onclick = () => {
