@@ -1245,6 +1245,46 @@
 .hidden-file-input {
     display: none;
 }
+
+/* ========== CHAT FLOTANTE (Zoho Desk) ========== */
+.zchat-fab{position:fixed;right:24px;bottom:24px;width:62px;height:62px;border-radius:50%;background:var(--primary-yellow);color:#000;border:none;box-shadow:0 8px 24px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:950;transition:transform .2s ease}
+.zchat-fab:hover{transform:scale(1.07)}
+.zchat-fab svg{width:30px;height:30px}
+.zchat-tip{position:fixed;right:98px;bottom:39px;background:var(--secondary-black);color:var(--text-white);border:2px solid var(--primary-yellow);border-radius:8px;padding:7px 12px;font-size:14px;font-weight:600;z-index:950;white-space:nowrap;animation:zchatIn .3s ease}
+.zchat-panel{position:fixed;right:24px;bottom:100px;width:370px;max-width:calc(100vw - 32px);height:540px;max-height:calc(100vh - 130px);background:var(--secondary-black);border:2px solid var(--primary-yellow);border-radius:14px;display:none;flex-direction:column;overflow:hidden;z-index:950;box-shadow:0 16px 48px rgba(0,0,0,.6)}
+.zchat-panel.open{display:flex;animation:zchatIn .25s ease}
+@keyframes zchatIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.zchat-head{background:var(--primary-yellow);color:#000;padding:12px 14px;display:flex;align-items:center;gap:10px}
+.zchat-av{width:38px;height:38px;border-radius:50%;background:#000;color:var(--primary-yellow);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:22px;flex-shrink:0}
+.zchat-head b{display:block;font-size:16px;line-height:1.2}
+.zchat-head small{font-size:12.5px;opacity:.8}
+.zchat-close{margin-left:auto;background:transparent;border:none;font-size:26px;line-height:1;cursor:pointer;color:#000;padding:0 4px}
+.zchat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;background:var(--primary-black)}
+.zchat-msgs::-webkit-scrollbar{width:6px}.zchat-msgs::-webkit-scrollbar-thumb{background:var(--primary-yellow);border-radius:3px}
+.zm{max-width:84%;padding:9px 13px;border-radius:14px;font-size:14.5px;line-height:1.4;white-space:pre-wrap;word-wrap:break-word;user-select:text;-webkit-user-select:text;animation:zchatIn .2s ease}
+.zm.bot{background:var(--tertiary-black);color:var(--text-white);align-self:flex-start;border-bottom-left-radius:4px}
+.zm.me{background:var(--primary-yellow);color:#000;align-self:flex-end;border-bottom-right-radius:4px}
+.zm .zrow{margin-top:4px}.zm .zrow b{color:var(--primary-yellow)}
+.zm.typing{display:flex;gap:4px;padding:12px 14px}
+.zm.typing i{width:7px;height:7px;border-radius:50%;background:var(--text-gray);animation:zdot 1s infinite}
+.zm.typing i:nth-child(2){animation-delay:.15s}.zm.typing i:nth-child(3){animation-delay:.3s}
+@keyframes zdot{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+.zchat-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 12px;background:var(--primary-black)}
+.zchat-chips:empty{display:none}
+.zchat-chip{background:transparent;border:1.5px solid var(--primary-yellow);color:var(--primary-yellow);border-radius:999px;padding:7px 13px;font-family:'Outfit',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer}
+.zchat-chip:hover{background:var(--primary-yellow);color:#000}
+.zchat-input{display:flex;gap:8px;padding:10px;border-top:1px solid var(--border-gray);background:var(--secondary-black);align-items:flex-end}
+.zchat-input textarea{flex:1;resize:none;background:var(--tertiary-black);border:1px solid var(--border-gray);color:var(--text-white);border-radius:18px;padding:9px 14px;font-family:'Outfit',sans-serif;font-size:14.5px;height:40px;max-height:110px;outline:none;user-select:text;-webkit-user-select:text}
+.zchat-input textarea:focus{border-color:var(--primary-yellow)}
+.zchat-input textarea:disabled{opacity:.5}
+.zchat-send{width:40px;height:40px;border-radius:50%;border:none;background:var(--primary-yellow);color:#000;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.zchat-send:disabled{opacity:.4;cursor:default}
+.zchat-send svg{width:18px;height:18px}
+@media (max-width:768px){
+  .zchat-panel{right:8px;left:8px;width:auto;max-width:none;bottom:88px;height:calc(100vh - 110px);max-height:none}
+  .zchat-fab{right:16px;bottom:16px}
+  .zchat-tip{display:none}
+}
     </style>
 </head>
 
@@ -1270,7 +1310,6 @@
             <button class="nav-button" data-section="humanos">RH</button>
             <button class="nav-button" data-section="productos">Productos</button>
             <button class="nav-button" data-section="docs" id="docs-button-mobile">Reglamento</button>
-            <button class="nav-button" data-section="zoho" style="display:none">Formulario Zoho</button>
         </div>
 
         <div class="mobile-user-section">
@@ -1299,7 +1338,6 @@
                 <button class="nav-button" data-section="humanos">RH</button>
                 <button class="nav-button" data-section="productos">Productos</button>
                 <button class="nav-button" data-section="docs" id="docs-button">Reglamento</button>
-                <button class="nav-button" data-section="zoho" style="display:none">Formulario Zoho</button>
             </div>
 
             <!-- Sección de usuario y logout -->
@@ -1409,7 +1447,7 @@
         const permisosPorRol = {
             'admin': {
                 nombre: 'Administrador',
-                permisos: ['inicio', 'adn', 'avisos', 'humanos', 'productos', 'docs', 'zoho'],
+                permisos: ['inicio', 'adn', 'avisos', 'humanos', 'productos', 'docs'],
                 color: 'admin'
             },
             'directivo': {
@@ -1996,10 +2034,6 @@
             productos: productosTemplate,
             docs: `
         <iframe src="flipbook.html" style="width:100%; height:100%; border:none;"></iframe>
-    `,
-            // Formulario de Zoho Desk (solo administradores)
-            zoho: `
-        <iframe src="zoho-form.html" style="width:100%; height:100%; border:none; background:#fff;"></iframe>
     `
         };
 
@@ -2251,7 +2285,7 @@
             contentArea.innerHTML = contentTemplates[section];
 
             // Modo iframe completo para docs
-            if (section === "docs" || section === "zoho") {
+            if (section === "docs") {
                 contentArea.classList.add("full-iframe");
             } else {
                 contentArea.classList.remove("full-iframe");
@@ -2423,6 +2457,9 @@ if (promesa) {
 
             // Aplicar permisos en la interfaz
             aplicarPermisosEnUI();
+
+            // Globito de chat (Zoho Desk)
+            initChatZoho();
 
             // Configurar event listeners
             setupEventListeners();
@@ -2762,6 +2799,235 @@ async function subirExcel(file) {
 
     return result;
 }
+
+        // ========== CHAT FLOTANTE → ZOHO DESK ==========
+        // Roles que ven el globito. Para mostrarlo a todos: ['admin','directivo','comite','adn','empleado']
+        const CHAT_ROLES = ['admin'];
+
+        // Datos del formulario web avanzado de Zoho Desk (no cambiar)
+        const ZOHO_FORM = {
+            action: 'https://desk.zoho.com/support/WebToCase',
+            hidden: {
+                xnQsjsdp: 'edbsndfd84d21adbc81c903310001c6433bfa',
+                xmIwtLD: 'edbsn5918b8f081d33418db5d365f3d3256a3db2169af72509da36911fafad25b6d81',
+                xJdfEaS: '',
+                actionType: 'Q2FzZXM=',
+                returnURL: 'https://cliff-company.github.io/IntraNet/zoho-gracias.html'
+            }
+        };
+
+        const ZCHAT_EMAIL_RE = /^([\w_][\w\-_.+\'&]*)@(?=.{4,256}$)(([\w]+)([\-_]*[\w])*[\.])+[a-zA-Z]{2,22}$/;
+        const ZCHAT_STEPS = [
+            { key: 'First Name', label: 'Nombre',
+              ask: () => '¡Hola! 👋 Gracias por escribir a Cliff and Company.\n¿Cuál es tu nombre?',
+              check: v => v.length >= 2 || 'Escribe tu nombre, por favor.' },
+            { key: 'Contact Name', label: 'Apellidos',
+              ask: d => `Mucho gusto, ${d['First Name']}. ¿Cuáles son tus apellidos?`,
+              check: v => v.length >= 2 || 'Escribe tus apellidos, por favor.' },
+            { key: 'Email', label: 'Correo',
+              ask: () => '¿A qué correo te podemos contactar?',
+              check: v => ZCHAT_EMAIL_RE.test(v) || 'Ese correo no parece válido. ¿Lo revisas? (ej. nombre@empresa.com)' },
+            { key: 'Subject', label: 'Tema',
+              ask: () => '¿En qué te podemos ayudar? Elige una opción o escríbelo.',
+              chips: ['Cotización', 'Información de productos', 'Quiero ser distribuidor', 'Otro'],
+              check: v => v.length >= 2 || 'Cuéntame brevemente el tema.' },
+            { key: 'Description', label: 'Mensaje', multiline: true,
+              ask: () => 'Perfecto. Cuéntanos un poco más para darte una mejor respuesta.',
+              check: v => v.length >= 3 || 'Escribe tu mensaje, por favor.' }
+        ];
+
+        const zchat = { step: 0, data: {}, mode: 'idle', started: false };
+
+        function initChatZoho() {
+            if (!CHAT_ROLES.includes(rolUsuario)) return;
+
+            const fab = document.createElement('button');
+            fab.className = 'zchat-fab';
+            fab.setAttribute('aria-label', 'Abrir chat');
+            fab.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>';
+
+            const panel = document.createElement('div');
+            panel.className = 'zchat-panel';
+            panel.innerHTML = `
+                <div class="zchat-head">
+                    <div class="zchat-av">C</div>
+                    <div><b>Cliff and Company</b><small>Te respondemos lo antes posible</small></div>
+                    <button class="zchat-close" aria-label="Cerrar">×</button>
+                </div>
+                <div class="zchat-msgs" id="zchatMsgs"></div>
+                <div class="zchat-chips" id="zchatChips"></div>
+                <form class="zchat-input" id="zchatForm">
+                    <textarea id="zchatText" rows="1" placeholder="Escribe aquí…"></textarea>
+                    <button class="zchat-send" type="submit" aria-label="Enviar"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 20.5 21 12 3 3.5 3 10l12 2-12 2z"/></svg></button>
+                </form>`;
+
+            const tip = document.createElement('div');
+            tip.className = 'zchat-tip';
+            tip.textContent = '¿Dudas? Escríbenos';
+
+            document.body.append(panel, tip, fab);
+            setTimeout(() => tip.remove(), 7000);
+
+            fab.onclick = () => {
+                tip.remove();
+                panel.classList.toggle('open');
+                if (panel.classList.contains('open')) {
+                    if (!zchat.started) { zchat.started = true; zchatAsk(); }
+                    setTimeout(() => document.getElementById('zchatText').focus(), 50);
+                }
+            };
+            panel.querySelector('.zchat-close').onclick = () => panel.classList.remove('open');
+
+            const text = document.getElementById('zchatText');
+            document.getElementById('zchatForm').onsubmit = e => { e.preventDefault(); zchatUserInput(text.value); };
+            text.addEventListener('keydown', e => {
+                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); zchatUserInput(text.value); }
+            });
+            text.addEventListener('input', () => { text.style.height = '40px'; text.style.height = Math.min(text.scrollHeight, 110) + 'px'; });
+        }
+
+        function zchatScroll() { const m = document.getElementById('zchatMsgs'); m.scrollTop = m.scrollHeight; }
+
+        function zchatAdd(who, content) {
+            const div = document.createElement('div');
+            div.className = 'zm ' + who;
+            if (typeof content === 'string') div.textContent = content; else div.appendChild(content);
+            document.getElementById('zchatMsgs').appendChild(div);
+            zchatScroll();
+            return div;
+        }
+
+        function zchatBot(content, delay = 550) {
+            return new Promise(res => {
+                const t = zchatAdd('bot typing', '');
+                t.innerHTML = '<i></i><i></i><i></i>';
+                setTimeout(() => { t.remove(); zchatAdd('bot', content); res(); }, delay);
+            });
+        }
+
+        function zchatChips(list) {
+            const box = document.getElementById('zchatChips');
+            box.innerHTML = '';
+            (list || []).forEach(c => {
+                const b = document.createElement('button');
+                b.type = 'button'; b.className = 'zchat-chip'; b.textContent = c.label || c;
+                b.onclick = () => c.action ? c.action() : zchatUserInput(c);
+                box.appendChild(b);
+            });
+            zchatScroll();
+        }
+
+        function zchatInputEnabled(on, placeholder) {
+            const t = document.getElementById('zchatText');
+            t.disabled = !on;
+            t.placeholder = placeholder || 'Escribe aquí…';
+            document.querySelector('.zchat-send').disabled = !on;
+            if (on) setTimeout(() => t.focus(), 30);
+        }
+
+        async function zchatAsk() {
+            zchat.mode = 'asking';
+            const s = ZCHAT_STEPS[zchat.step];
+            zchatChips([]);
+            zchatInputEnabled(false);
+            await zchatBot(s.ask(zchat.data));
+            zchatChips(s.chips);
+            zchatInputEnabled(true, s.multiline ? 'Escribe tu mensaje… (Shift+Enter = nueva línea)' : 'Escribe aquí…');
+        }
+
+        async function zchatUserInput(raw) {
+            const v = String(raw || '').trim();
+            const t = document.getElementById('zchatText');
+            if (zchat.mode !== 'asking' || !v) return;
+            t.value = ''; t.style.height = '40px';
+            zchatAdd('me', v);
+            zchatChips([]);
+            const s = ZCHAT_STEPS[zchat.step];
+            const ok = s.check(v);
+            if (ok !== true) { zchatInputEnabled(false); await zchatBot(ok); zchatChips(s.chips); zchatInputEnabled(true); return; }
+            zchat.data[s.key] = v;
+            zchat.step++;
+            if (zchat.step < ZCHAT_STEPS.length) zchatAsk(); else zchatConfirm();
+        }
+
+        async function zchatConfirm() {
+            zchat.mode = 'confirm';
+            zchatInputEnabled(false, 'Elige una opción');
+            const box = document.createElement('div');
+            box.appendChild(document.createTextNode('¡Gracias! Esto es lo que vamos a enviar:'));
+            ZCHAT_STEPS.forEach(s => {
+                const r = document.createElement('div'); r.className = 'zrow';
+                const b = document.createElement('b'); b.textContent = s.label + ': ';
+                r.append(b, document.createTextNode(zchat.data[s.key]));
+                box.appendChild(r);
+            });
+            await zchatBot(box, 700);
+            zchatChips([{ label: 'Enviar ✓', action: zchatSubmit }, { label: 'Empezar de nuevo', action: zchatRestart }]);
+        }
+
+        function zchatRestart() {
+            zchat.step = 0; zchat.data = {};
+            document.getElementById('zchatMsgs').innerHTML = '';
+            zchatAsk();
+        }
+
+        function zchatSubmit() {
+            zchat.mode = 'sending';
+            zchatChips([]);
+            zchatAdd('me', 'Enviar ✓');
+            const typing = zchatAdd('bot typing', ''); typing.innerHTML = '<i></i><i></i><i></i>';
+
+            // iframe oculto donde Zoho recibe el formulario sin salir de la intranet
+            let frame = document.getElementById('zchatFrame');
+            if (!frame) {
+                frame = document.createElement('iframe');
+                frame.name = frame.id = 'zchatFrame';
+                frame.style.display = 'none';
+                document.body.appendChild(frame);
+            }
+
+            let done = false, failTimer = null;
+            const finish = async ok => {
+                if (done) return; done = true;
+                clearTimeout(failTimer); clearTimeout(maxTimer); frame.onload = null;
+                typing.remove();
+                if (ok) {
+                    zchat.mode = 'done';
+                    await zchatBot(`¡Listo, ${zchat.data['First Name']}! ✅\nRecibimos tu mensaje y te contactaremos pronto a ${zchat.data['Email']}.`, 300);
+                    zchatChips([{ label: 'Enviar otro mensaje', action: zchatRestart }]);
+                } else {
+                    zchat.mode = 'confirm';
+                    await zchatBot('Ups, no pudimos enviar tu mensaje. 😕 Revisa tu conexión e inténtalo de nuevo.', 300);
+                    zchatChips([{ label: 'Reintentar', action: zchatSubmit }, { label: 'Empezar de nuevo', action: zchatRestart }]);
+                }
+            };
+            const maxTimer = setTimeout(() => finish(false), 25000);
+            frame.onload = () => {
+                let ok = false;
+                try { ok = /zoho-gracias/.test(frame.contentWindow.location.href); } catch (e) { ok = false; }
+                if (ok) return finish(true);
+                // Zoho puede pasar por una página intermedia antes de redirigir: esperamos un poco
+                clearTimeout(failTimer);
+                failTimer = setTimeout(() => finish(false), 5000);
+            };
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = ZOHO_FORM.action;
+            form.enctype = 'multipart/form-data';
+            form.acceptCharset = 'UTF-8';
+            form.target = 'zchatFrame';
+            form.style.display = 'none';
+            const fields = Object.assign({}, ZOHO_FORM.hidden, zchat.data);
+            Object.keys(fields).forEach(k => {
+                const i = document.createElement('input');
+                i.type = 'hidden'; i.name = k; i.value = fields[k];
+                form.appendChild(i);
+            });
+            document.body.appendChild(form);
+            form.submit();
+            form.remove();
+        }
     </script>
 </body>
 
