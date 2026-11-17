@@ -1270,6 +1270,7 @@
             <button class="nav-button" data-section="humanos">RH</button>
             <button class="nav-button" data-section="productos">Productos</button>
             <button class="nav-button" data-section="docs" id="docs-button-mobile">Reglamento</button>
+            <button class="nav-button" data-section="zoho" style="display:none">Formulario Zoho</button>
         </div>
 
         <div class="mobile-user-section">
@@ -1298,6 +1299,7 @@
                 <button class="nav-button" data-section="humanos">RH</button>
                 <button class="nav-button" data-section="productos">Productos</button>
                 <button class="nav-button" data-section="docs" id="docs-button">Reglamento</button>
+                <button class="nav-button" data-section="zoho" style="display:none">Formulario Zoho</button>
             </div>
 
             <!-- Sección de usuario y logout -->
@@ -1407,7 +1409,7 @@
         const permisosPorRol = {
             'admin': {
                 nombre: 'Administrador',
-                permisos: ['inicio', 'adn', 'avisos', 'humanos', 'productos', 'docs'],
+                permisos: ['inicio', 'adn', 'avisos', 'humanos', 'productos', 'docs', 'zoho'],
                 color: 'admin'
             },
             'directivo': {
@@ -1994,6 +1996,10 @@
             productos: productosTemplate,
             docs: `
         <iframe src="flipbook.html" style="width:100%; height:100%; border:none;"></iframe>
+    `,
+            // Formulario de Zoho Desk (solo administradores)
+            zoho: `
+        <iframe src="zoho-form.html" style="width:100%; height:100%; border:none; background:#fff;"></iframe>
     `
         };
 
@@ -2245,7 +2251,7 @@
             contentArea.innerHTML = contentTemplates[section];
 
             // Modo iframe completo para docs
-            if (section === "docs") {
+            if (section === "docs" || section === "zoho") {
                 contentArea.classList.add("full-iframe");
             } else {
                 contentArea.classList.remove("full-iframe");
@@ -2761,6 +2767,5 @@ async function subirExcel(file) {
 
 
 </html>
-
 
 
