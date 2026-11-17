@@ -2816,10 +2816,81 @@ async function subirExcel(file) {
             }
         };
 
+        // Chat en vivo (Zoho SalesIQ) para "Asesoramiento ejecutivo"
+        const SALESIQ = {
+            widget: 'https://salesiq.zohopublic.com/widget?wc=siqcc7f253fd8cd8c23b90979554b13d86ceceb2d5fb7e95407ce2ecfab3accbda6',
+            // Si tu marca tiene varios departamentos, escribe aquí el nombre exacto del del ejecutivo.
+            // Vacío = se usa el departamento de la marca.
+            departamento: ''
+        };
+        let salesiqListo = false;
+
+        function cargarSalesIQ() {
+            if (document.getElementById('zsiqscript')) return;
+            window.$zoho = window.$zoho || {};
+            $zoho.salesiq = $zoho.salesiq || {};
+            $zoho.salesiq.ready = function () {
+                salesiqListo = true;
+                try { $zoho.salesiq.floatbutton.visible('hide'); } catch (e) {}
+                try {
+                    if (usuarioInfo) {
+                        $zoho.salesiq.visitor.name(usuarioInfo.nombreCompleto || usuarioInfo.username);
+                    }
+                } catch (e) {}
+                try { if (SALESIQ.departamento) $zoho.salesiq.chat.department([SALESIQ.departamento]); } catch (e) {}
+            };
+            const sc = document.createElement('script');
+            sc.id = 'zsiqscript';
+            sc.src = SALESIQ.widget;
+            sc.defer = true;
+            document.body.appendChild(sc);
+        }
+
+        async function abrirAsesorEjecutivo() {
+            zchat.mode = 'menu';
+            zchatChips([]);
+            zchatAdd('me', '👔 Asesoramiento ejecutivo');
+            if (!salesiqListo || !window.$zoho || !$zoho.salesiq || !$zoho.salesiq.floatwindow) {
+                await zchatBot('El chat en vivo todavía se está cargando. Intenta de nuevo en unos segundos. 🙏');
+                return zchatMenuChips();
+            }
+            await zchatBot('Te conecto con tu ejecutivo designado. Se abrirá la ventana del chat en vivo. 💬', 500);
+            setTimeout(() => {
+                document.querySelector('.zchat-panel').classList.remove('open');
+                try { $zoho.salesiq.floatwindow.visible('show'); } catch (e) {}
+                zchatMenuChips();
+            }, 700);
+        }
+
+        function zchatMenuChips() {
+            zchat.mode = 'menu';
+            zchatInputEnabled(false, 'Elige una opción');
+            zchatChips([
+                { label: '📝 Dejar un mensaje', action: zchatIniciarMensaje },
+                { label: '👔 Asesoramiento ejecutivo', action: abrirAsesorEjecutivo }
+            ]);
+        }
+
+        async function zchatMenu() {
+            zchat.step = 0; zchat.data = {};
+            document.getElementById('zchatMsgs').innerHTML = '';
+            zchatChips([]);
+            zchatInputEnabled(false, 'Elige una opción');
+            await zchatBot('¡Hola! 👋 Bienvenido a Cliff and Company.\n¿Cómo te podemos ayudar?');
+            zchatMenuChips();
+        }
+
+        function zchatIniciarMensaje() {
+            zchatChips([]);
+            zchatAdd('me', '📝 Dejar un mensaje');
+            zchat.step = 0; zchat.data = {};
+            zchatAsk();
+        }
+
         const ZCHAT_EMAIL_RE = /^([\w_][\w\-_.+\'&]*)@(?=.{4,256}$)(([\w]+)([\-_]*[\w])*[\.])+[a-zA-Z]{2,22}$/;
         const ZCHAT_STEPS = [
             { key: 'First Name', label: 'Nombre',
-              ask: () => '¡Hola! 👋 Gracias por escribir a Cliff and Company.\n¿Cuál es tu nombre?',
+              ask: () => 'Con gusto. ¿Cuál es tu nombre?',
               check: v => v.length >= 2 || 'Escribe tu nombre, por favor.' },
             { key: 'Contact Name', label: 'Apellidos',
               ask: d => `Mucho gusto, ${d['First Name']}. ¿Cuáles son tus apellidos?`,
@@ -2866,13 +2937,14 @@ async function subirExcel(file) {
             tip.textContent = '¿Dudas? Escríbenos';
 
             document.body.append(panel, tip, fab);
+            cargarSalesIQ();
             setTimeout(() => tip.remove(), 7000);
 
             fab.onclick = () => {
                 tip.remove();
                 panel.classList.toggle('open');
                 if (panel.classList.contains('open')) {
-                    if (!zchat.started) { zchat.started = true; zchatAsk(); }
+                    if (!zchat.started) { zchat.started = true; zchatMenu(); }
                     setTimeout(() => document.getElementById('zchatText').focus(), 50);
                 }
             };
@@ -2965,11 +3037,7 @@ async function subirExcel(file) {
             zchatChips([{ label: 'Enviar ✓', action: zchatSubmit }, { label: 'Empezar de nuevo', action: zchatRestart }]);
         }
 
-        function zchatRestart() {
-            zchat.step = 0; zchat.data = {};
-            document.getElementById('zchatMsgs').innerHTML = '';
-            zchatAsk();
-        }
+        function zchatRestart() { zchatMenu(); }
 
         function zchatSubmit() {
             zchat.mode = 'sending';
