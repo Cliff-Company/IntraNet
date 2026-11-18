@@ -1247,11 +1247,11 @@
 }
 
 /* ========== CHAT FLOTANTE (Zoho Desk) ========== */
-.zchat-fab{position:fixed;right:24px;bottom:24px;width:62px;height:62px;border-radius:50%;background:var(--primary-yellow);color:#000;border:none;box-shadow:0 8px 24px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:950;transition:transform .2s ease}
+.zchat-fab{position:relative;width:62px;height:62px;border-radius:50%;background:var(--primary-yellow);color:#000;border:none;box-shadow:0 8px 24px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:950;transition:transform .2s ease}
 .zchat-fab:hover{transform:scale(1.07)}
 .zchat-fab svg{width:30px;height:30px}
 .zchat-tip{position:fixed;right:98px;bottom:39px;background:var(--secondary-black);color:var(--text-white);border:2px solid var(--primary-yellow);border-radius:8px;padding:7px 12px;font-size:14px;font-weight:600;z-index:950;white-space:nowrap;animation:zchatIn .3s ease}
-.zchat-panel{position:fixed;right:24px;bottom:100px;width:370px;max-width:calc(100vw - 32px);height:540px;max-height:calc(100vh - 130px);background:var(--secondary-black);border:2px solid var(--primary-yellow);border-radius:14px;display:none;flex-direction:column;overflow:hidden;z-index:950;box-shadow:0 16px 48px rgba(0,0,0,.6)}
+.zchat-panel{position:fixed;right:24px;bottom:176px;width:370px;max-width:calc(100vw - 32px);height:540px;max-height:calc(100vh - 130px);background:var(--secondary-black);border:2px solid var(--primary-yellow);border-radius:14px;display:none;flex-direction:column;overflow:hidden;z-index:950;box-shadow:0 16px 48px rgba(0,0,0,.6)}
 .zchat-panel.open{display:flex;animation:zchatIn .25s ease}
 @keyframes zchatIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 .zchat-head{background:var(--primary-yellow);color:#000;padding:12px 14px;display:flex;align-items:center;gap:10px}
@@ -1280,10 +1280,17 @@
 .zchat-send{width:40px;height:40px;border-radius:50%;border:none;background:var(--primary-yellow);color:#000;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .zchat-send:disabled{opacity:.4;cursor:default}
 .zchat-send svg{width:18px;height:18px}
+/* Dos globitos: Zoho y Zendesk */
+.zfab-wrap{position:fixed;right:24px;bottom:24px;display:flex;flex-direction:column;gap:14px;align-items:flex-end;z-index:950;transition:right .3s ease}
+.zfab-wrap.desplazado{right:430px}
+.zfab-item{display:flex;align-items:center;gap:10px}
+.zfab-label{background:var(--secondary-black);border:2px solid var(--primary-yellow);color:var(--text-white);padding:5px 11px;border-radius:6px;font-size:13px;font-weight:600;letter-spacing:.5px;white-space:nowrap}
+.zchat-fab.zendesk{background:#000;color:var(--primary-yellow);border:2px solid var(--primary-yellow)}
 @media (max-width:768px){
-  .zchat-panel{right:8px;left:8px;width:auto;max-width:none;bottom:88px;height:calc(100vh - 110px);max-height:none}
-  .zchat-fab{right:16px;bottom:16px}
-  .zchat-tip{display:none}
+  .zchat-panel{right:8px;left:8px;width:auto;max-width:none;bottom:160px;height:calc(100vh - 190px);max-height:none}
+  .zfab-wrap{right:16px;bottom:16px}
+  .zfab-wrap.desplazado{display:none}
+  .zfab-label{display:none}
 }
     </style>
 </head>
@@ -2816,6 +2823,64 @@ async function subirExcel(file) {
             }
         };
 
+        // ===== MODO PRESENTACIÓN: dos globitos =====
+        // 'salesiq' = el globito de Zoho abre directo el chat de SalesIQ (bot + paso a persona + estadísticas)
+        // 'menu'    = el globito de Zoho muestra el chat propio (Dejar un mensaje → Zoho Desk / Asesoramiento ejecutivo → SalesIQ)
+        const ZOHO_MODO = 'salesiq';
+
+        // Zendesk: pega aquí la "key" de tu Web Widget de Mensajería (Admin Center → Canales → Mensajería)
+        const ZENDESK = { key: 'PEGA_AQUI_TU_KEY_DE_ZENDESK' };
+        let zendeskListo = false;
+
+        function desplazarBurbujas(on) {
+            const w = document.getElementById('zfabWrap');
+            if (w) w.classList.toggle('desplazado', on);
+        }
+
+        function cerrarSalesIQ() { try { if (salesiqListo) $zoho.salesiq.floatwindow.visible('hide'); } catch (e) {} }
+        function cerrarZendesk() { try { if (zendeskListo) { zE('messenger', 'close'); zE('messenger', 'hide'); } } catch (e) {} }
+
+        function abrirSalesIQDirecto() {
+            if (!salesiqListo) return mostrarNotificacion('⏳ El chat de Zoho se está cargando, intenta en unos segundos', 'error');
+            document.querySelector('.zchat-panel')?.classList.remove('open');
+            cerrarZendesk();
+            desplazarBurbujas(true);
+            try { $zoho.salesiq.floatwindow.visible('show'); } catch (e) { desplazarBurbujas(false); }
+        }
+
+        function cargarZendesk() {
+            if (!ZENDESK.key || ZENDESK.key.indexOf('PEGA_AQUI') === 0 || document.getElementById('ze-snippet')) return;
+            const sc = document.createElement('script');
+            sc.id = 'ze-snippet';
+            sc.src = 'https://static.zdassets.com/ekr/snippet.js?key=' + encodeURIComponent(ZENDESK.key);
+            sc.onload = () => {
+                let intentos = 0;
+                const esperar = setInterval(() => {
+                    if (typeof window.zE === 'function') {
+                        clearInterval(esperar);
+                        try {
+                            zE('messenger', 'hide');                 // ocultar su botón propio
+                            zE('messenger:set', 'locale', 'es');
+                            zE('messenger:on', 'close', () => { try { zE('messenger', 'hide'); } catch (e) {} desplazarBurbujas(false); });
+                            zendeskListo = true;
+                        } catch (e) { console.warn('Zendesk:', e); }
+                    } else if (++intentos > 50) { clearInterval(esperar); }
+                }, 200);
+            };
+            document.body.appendChild(sc);
+        }
+
+        function abrirZendesk() {
+            if (!ZENDESK.key || ZENDESK.key.indexOf('PEGA_AQUI') === 0) {
+                return mostrarNotificacion('⚙️ Falta pegar la key de Zendesk en el código (busca ZENDESK)', 'error');
+            }
+            if (!zendeskListo) return mostrarNotificacion('⏳ El chat de Zendesk se está cargando, intenta en unos segundos', 'error');
+            document.querySelector('.zchat-panel')?.classList.remove('open');
+            cerrarSalesIQ();
+            desplazarBurbujas(true);
+            try { zE('messenger', 'show'); zE('messenger', 'open'); } catch (e) { desplazarBurbujas(false); }
+        }
+
         // Chat en vivo (Zoho SalesIQ) para "Asesoramiento ejecutivo"
         const SALESIQ = {
             widget: 'https://salesiq.zohopublic.com/widget?wc=siqcc7f253fd8cd8c23b90979554b13d86ceceb2d5fb7e95407ce2ecfab3accbda6',
@@ -2838,6 +2903,13 @@ async function subirExcel(file) {
                     }
                 } catch (e) {}
                 try { if (SALESIQ.departamento) $zoho.salesiq.chat.department([SALESIQ.departamento]); } catch (e) {}
+                ['close', 'minimize'].forEach(ev => {
+                    try {
+                        if (typeof $zoho.salesiq.floatwindow[ev] === 'function') {
+                            $zoho.salesiq.floatwindow[ev](() => desplazarBurbujas(false));
+                        }
+                    } catch (e) {}
+                });
             };
             const sc = document.createElement('script');
             sc.id = 'zsiqscript';
@@ -2857,6 +2929,8 @@ async function subirExcel(file) {
             await zchatBot('Te conecto con tu ejecutivo designado. Se abrirá la ventana del chat en vivo. 💬', 500);
             setTimeout(() => {
                 document.querySelector('.zchat-panel').classList.remove('open');
+                cerrarZendesk();
+                desplazarBurbujas(true);
                 try { $zoho.salesiq.floatwindow.visible('show'); } catch (e) {}
                 zchatMenuChips();
             }, 700);
@@ -2912,10 +2986,16 @@ async function subirExcel(file) {
         function initChatZoho() {
             if (!CHAT_ROLES.includes(rolUsuario)) return;
 
-            const fab = document.createElement('button');
-            fab.className = 'zchat-fab';
-            fab.setAttribute('aria-label', 'Abrir chat');
-            fab.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>';
+            const ICON_CHAT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>';
+
+            const wrap = document.createElement('div');
+            wrap.className = 'zfab-wrap';
+            wrap.id = 'zfabWrap';
+            wrap.innerHTML = `
+                <div class="zfab-item"><span class="zfab-label">Zendesk</span>
+                    <button class="zchat-fab zendesk" id="fabZendesk" aria-label="Abrir chat Zendesk">${ICON_CHAT}</button></div>
+                <div class="zfab-item"><span class="zfab-label">Zoho</span>
+                    <button class="zchat-fab" id="fabZoho" aria-label="Abrir chat Zoho">${ICON_CHAT}</button></div>`;
 
             const panel = document.createElement('div');
             panel.className = 'zchat-panel';
@@ -2932,16 +3012,14 @@ async function subirExcel(file) {
                     <button class="zchat-send" type="submit" aria-label="Enviar"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 20.5 21 12 3 3.5 3 10l12 2-12 2z"/></svg></button>
                 </form>`;
 
-            const tip = document.createElement('div');
-            tip.className = 'zchat-tip';
-            tip.textContent = '¿Dudas? Escríbenos';
-
-            document.body.append(panel, tip, fab);
+            document.body.append(panel, wrap);
             cargarSalesIQ();
-            setTimeout(() => tip.remove(), 7000);
+            cargarZendesk();
 
-            fab.onclick = () => {
-                tip.remove();
+            document.getElementById('fabZendesk').onclick = abrirZendesk;
+            document.getElementById('fabZoho').onclick = () => {
+                if (ZOHO_MODO === 'salesiq') return abrirSalesIQDirecto();
+                cerrarSalesIQ(); cerrarZendesk(); desplazarBurbujas(false);
                 panel.classList.toggle('open');
                 if (panel.classList.contains('open')) {
                     if (!zchat.started) { zchat.started = true; zchatMenu(); }
